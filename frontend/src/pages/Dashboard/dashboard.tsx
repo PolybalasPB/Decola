@@ -223,28 +223,30 @@ const Dashboard = () => {
       console.log('Buscando dados com mês:', mes, 'e ano:', ano);
       const dashboardData = await apiService.getDashboard(mes, ano);
       
-      // Processar dados para incluir todos os fornecedores
-      const todosFornecedores = metaTotal.map(meta => {
-        const fornecedorExistente = dashboardData.dados.find(
-          (d: DadosFornecedor) => d.idFornecedor === meta.id
-        );
+      // Processar dados para incluir todos os fornecedores da rede do usuário
+      const todosFornecedores = metaTotal
+        .filter(meta => meta.id === dashboardData.cliente.idRede) // Filtra apenas fornecedores da rede do usuário
+        .map(meta => {
+          const fornecedorExistente = dashboardData.dados.find(
+            (d: DadosFornecedor) => d.idFornecedor === meta.id
+          );
 
-        if (fornecedorExistente) {
-          return fornecedorExistente;
-        }
+          if (fornecedorExistente) {
+            return fornecedorExistente;
+          }
 
-        return {
-          idRede: meta.id,
-          nomeRede: meta.nome,
-          idFornecedor: meta.id,
-          fornecedor: meta.nome,
-          meta: meta.metaTotal,
-          valorVenda: 0,
-          gap: meta.metaTotal,
-          repPercentual: 0,
-          status: 'Em Andamento'
-        };
-      });
+          return {
+            idRede: meta.id,
+            nomeRede: meta.nome,
+            idFornecedor: meta.id,
+            fornecedor: meta.nome,
+            meta: meta.metaTotal,
+            valorVenda: 0,
+            gap: meta.metaTotal,
+            repPercentual: 0,
+            status: 'Em Andamento'
+          };
+        });
 
       setData({
         ...dashboardData,
@@ -310,8 +312,8 @@ const Dashboard = () => {
   };
 
   const getMetaAtual = () => {
-    if (!data?.cliente?.id) return 0;
-    const metaTotal = getMetaTotal(data.cliente.id);
+    if (!data?.cliente?.idRede) return 0;
+    const metaTotal = getMetaTotal(data.cliente.idRede);
     return visualizacaoTipo === 'total' ? metaTotal : metaTotal / 6;
   };
 
