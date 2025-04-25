@@ -280,10 +280,39 @@ const Dashboard = () => {
       try {
         console.log('Buscando dados totais');
         const dashboardData = await apiService.getDashboardTotal();
-        setData(dashboardData);
+        
+        // Processar dados para incluir todos os fornecedores da rede do usuário
+        const todosFornecedores = metaTotal
+          .filter(meta => meta.id === dashboardData.cliente.idRede)
+          .map(meta => {
+            const fornecedorExistente = dashboardData.dados.find(
+              (d: DadosFornecedor) => d.idFornecedor === meta.id
+            );
+
+            if (fornecedorExistente) {
+              return fornecedorExistente;
+            }
+
+            return {
+              idRede: meta.id,
+              nomeRede: meta.nome,
+              idFornecedor: meta.id,
+              fornecedor: meta.nome,
+              meta: meta.metaTotal,
+              valorVenda: 0,
+              gap: meta.metaTotal,
+              repPercentual: 0,
+              status: 'Em Andamento'
+            };
+          });
+
+        setData({
+          ...dashboardData,
+          dados: todosFornecedores
+        });
         
         // Calcula o total de vendas
-        const total = dashboardData.dados.reduce((acc: number, item: DadosFornecedor) => acc + item.valorVenda, 0);
+        const total = todosFornecedores.reduce((acc: number, item: DadosFornecedor) => acc + item.valorVenda, 0);
         setTotalVendas(total);
       } catch (err) {
         console.error('Erro ao buscar dados totais:', err);
@@ -294,7 +323,8 @@ const Dashboard = () => {
     if (visualizacaoTipo === 'total') {
       fetchTotal();
     } else if (visualizacaoTipo === 'atual') {
-      fetchData();
+      setMesAnoSelecionado(null); // Limpa a seleção de mês
+      fetchData(); // Busca dados do mês atual
     }
   }, [visualizacaoTipo]);
 
@@ -304,6 +334,7 @@ const Dashboard = () => {
 
   const handleMesAnoChange = (mes: string, ano: string) => {
     setMesAnoSelecionado({ mes, ano });
+    setVisualizacaoTipo('atual'); // Força visualização atual ao selecionar mês
   };
 
   const getMetaTotal = (idRede: number): number => {
@@ -363,7 +394,7 @@ const Dashboard = () => {
         <ProgressContainer>
           <ProgressInfo>
             <ProgressLabel>Meta {visualizacaoTipo === 'total' ? 'Total' : 'Mensal'}</ProgressLabel>
-            <ProgressValue>{formatCurrency(getMetaAtual())}</ProgressValue>
+            <ProgressValue>{formatCurrency(metaAtual)}</ProgressValue>
           </ProgressInfo>
           <ProgressInfo>
             <ProgressLabel>Valor</ProgressLabel>
