@@ -182,6 +182,33 @@ const MesSelecionado = styled.div`
   margin-top: 0.5rem;
 `;
 
+const LoadingOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const LoadingSpinner = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -192,12 +219,40 @@ const Dashboard = () => {
 
   const fetchData = async (mes?: string, ano?: string) => {
     try {
+      setLoading(true);
       console.log('Buscando dados com mês:', mes, 'e ano:', ano);
       const dashboardData = await apiService.getDashboard(mes, ano);
-      setData(dashboardData);
+      
+      // Processar dados para incluir todos os fornecedores
+      const todosFornecedores = metaTotal.map(meta => {
+        const fornecedorExistente = dashboardData.dados.find(
+          (d: DadosFornecedor) => d.idFornecedor === meta.id
+        );
+
+        if (fornecedorExistente) {
+          return fornecedorExistente;
+        }
+
+        return {
+          idRede: meta.id,
+          nomeRede: meta.nome,
+          idFornecedor: meta.id,
+          fornecedor: meta.nome,
+          meta: meta.metaTotal,
+          valorVenda: 0,
+          gap: meta.metaTotal,
+          repPercentual: 0,
+          status: 'Em Andamento'
+        };
+      });
+
+      setData({
+        ...dashboardData,
+        dados: todosFornecedores
+      });
 
       // Calcula o total de vendas
-      const total = dashboardData.dados.reduce((acc: number, item: DadosFornecedor) => acc + item.valorVenda, 0);
+      const total = todosFornecedores.reduce((acc: number, item: DadosFornecedor) => acc + item.valorVenda, 0);
       setTotalVendas(total);
     } catch (err) {
       console.error('Erro ao buscar dados:', err);
@@ -277,6 +332,11 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer>
+      {loading && (
+        <LoadingOverlay>
+          <LoadingSpinner />
+        </LoadingOverlay>
+      )}
       <Content>
         <Header>
           <Logo src={logoPreto} alt="Logo Decola" />
