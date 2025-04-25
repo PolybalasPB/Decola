@@ -3,11 +3,10 @@ import styled from 'styled-components';
 import backgroundMobile from '../../assets/DISNEY MOBILE.jpg';
 import backgroundDesktop from '../../assets/DISNEY.jpg';
 import logoPreto from '../../assets/decola PRETO PNG.png';
-import { DashboardData, DadosFornecedor, HistoricoData, LogsData, VisualizacaoTipo } from '../../types/dashboardInterface';
-import { metaTotal } from '../../../../backend/src/database/metaTotal';
+import { DashboardData, DadosFornecedor, VisualizacaoTipo } from '../../types/dashboardInterface';
+import { metaTotal } from '../../types/metas';
 import VisualizacaoSelector from '../../components/VisualizacaoSelector';
 import { apiService } from '../../services/api';
-import { api } from '../../config/api';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
@@ -185,14 +184,11 @@ const MesSelecionado = styled.div`
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
-  const [historicoData, setHistoricoData] = useState<HistoricoData | null>(null);
-  const [logsData, setLogsData] = useState<LogsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalVendas, setTotalVendas] = useState(0);
   const [visualizacaoTipo, setVisualizacaoTipo] = useState<VisualizacaoTipo>('atual');
   const [mesAnoSelecionado, setMesAnoSelecionado] = useState<{ mes: string; ano: string } | null>(null);
-  const [metaTotalAtual, setMetaTotalAtual] = useState<number>(0);
 
   const fetchData = async (mes?: string, ano?: string) => {
     try {
@@ -245,24 +241,12 @@ const Dashboard = () => {
     }
   }, [visualizacaoTipo]);
 
-  useEffect(() => {
-    if (data?.cliente?.id) {
-      const meta = getMetaTotal(data.cliente.id);
-      setMetaTotalAtual(meta);
-    }
-  }, [data?.cliente?.id]);
-
   const handleTipoChange = (tipo: VisualizacaoTipo) => {
     setVisualizacaoTipo(tipo);
-    setMesAnoSelecionado(null);
-    if (tipo === 'atual') {
-      fetchData();
-    }
   };
 
   const handleMesAnoChange = (mes: string, ano: string) => {
     setMesAnoSelecionado({ mes, ano });
-    setVisualizacaoTipo('atual');
   };
 
   const getMetaTotal = (idRede: number): number => {
@@ -277,20 +261,8 @@ const Dashboard = () => {
   };
 
   const getDadosAtuais = () => {
-    if (!data) return null;
-
-    const dados = data.dados.map(dado => ({
-      ...dado,
-      meta: Number(dado.meta),
-      valorVenda: Number(dado.valorVenda),
-      gap: Number(dado.gap),
-      repPercentual: Number(dado.repPercentual)
-    }));
-
-    return {
-      ...data,
-      dados
-    };
+    if (!data?.dados) return [];
+    return data.dados;
   };
 
   if (loading) return <LoadingMessage>Carregando...</LoadingMessage>;
@@ -356,7 +328,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {dadosAtuais.dados.map((dado, index) => (
+              {dadosAtuais.map((dado, index) => (
                 <tr key={index}>
                   <Td>{dado.fornecedor}</Td>
                   <Td>{formatCurrency(dado.meta)}</Td>
