@@ -2,7 +2,6 @@ export interface Cliente {
   id: number;
   nome: string;
   rede: string;
-  idRede: number;
 }
 
 export interface RedeData {
@@ -19,7 +18,6 @@ export interface DadosFornecedor {
   valorVenda: number;
   gap: number;
   repPercentual: number;
-  status: string;
 }
 
 export interface MesAno {
@@ -34,7 +32,7 @@ export interface DashboardData {
     clientes: Record<string, any>;
   };
   dados: DadosFornecedor[];
-  mesesDisponiveis?: { mes: number; ano: number }[];
+  mesesDisponiveis: MesAno[];
 }
 
 export interface HistoricoData {
