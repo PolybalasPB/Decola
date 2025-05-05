@@ -19,7 +19,7 @@ export const metaTotal: MetaTotal[] = [
   { id: 22, nome: 'REDE GUEDES', metaTotal: 2318555.80 },
   { id: 28, nome: 'REDE PAI E FILHO', metaTotal: 1675820.91 },
   { id: 14, nome: 'REDE ALMIRANTE', metaTotal: 1519983.29 },
-  { id: 30, nome: 'REDE PONTES E SOARES', metaTotal: 2261199.76 },
+  { id: 30, nome: 'REDE PONTES E SOARES', metaTotal: 1066700 },
   { id: 29, nome: 'REDE PALMEIRAS', metaTotal: 1554742.42 },
   { id: 31, nome: 'REDE PRECO BOM', metaTotal: 1173670.92 },
   { id: 27, nome: 'REDE O FEIRAO', metaTotal: 1389734.59 },
