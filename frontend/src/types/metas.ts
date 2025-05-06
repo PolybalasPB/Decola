@@ -7,7 +7,7 @@ interface MetaTotal {
 export const metaTotal: MetaTotal[] = [
   { id: 17, nome: 'REDE BEMAIS', metaTotal: 13858461.46 },
   { id: 25, nome: 'REDE KI PRECO', metaTotal: 7846698.12 },
-  { id: 33, nome: 'REDE VAREJAO DO PRECO', metaTotal: 8142496.27 },
+  { id: 33, nome: 'REDE VAREJAO DO PRECO', metaTotal: 6287791.07 },
   { id: 21, nome: 'REDE COMPRAS', metaTotal: 6002691.00 },
   { id: 23, nome: 'REDE HIPER QUEIROZ', metaTotal: 5577112.49 },
   { id: 26, nome: 'REDE MANAIRA', metaTotal: 2973224.21 },
