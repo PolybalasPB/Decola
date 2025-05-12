@@ -65,7 +65,7 @@ const TableContainer = styled.div`
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(170, 55, 55, 0.1);
   overflow-x: auto;
 `;
 
@@ -243,6 +243,17 @@ const Dashboard = () => {
 
   const handleTipoChange = (tipo: VisualizacaoTipo) => {
     setVisualizacaoTipo(tipo);
+
+    if (tipo === 'total') {
+      setMesAnoSelecionado(null);
+    } else {
+      const hoje = new Date();
+      const mesAtual = hoje.getMonth() + 1; // Meses começam em 0
+      const anoAtual = hoje.getFullYear();
+
+      setMesAnoSelecionado({ mes: String(mesAtual), ano: String(anoAtual) });
+
+    }
   };
 
   const handleMesAnoChange = (mes: string, ano: string) => {
@@ -275,6 +286,7 @@ const Dashboard = () => {
   const metaAtual = getMetaAtual();
   const percentualTotal = metaAtual > 0 ? (totalVendas / metaAtual) * 100 : 0;
 
+
   return (
     <DashboardContainer>
       <Content>
@@ -283,11 +295,15 @@ const Dashboard = () => {
           <div>
             <h2>{data.cliente.nome}</h2>
             <p>{data.cliente.rede}</p>
-            {mesAnoSelecionado && (
-              <MesSelecionado>
-                {new Date(Number(mesAnoSelecionado.ano), Number(mesAnoSelecionado.mes) - 1)
-                  .toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}
-              </MesSelecionado>
+            {visualizacaoTipo === 'total' ? (
+              <MesSelecionado>Total</MesSelecionado>
+            ) : (
+              mesAnoSelecionado && (
+                <MesSelecionado>
+                  {new Date(Number(mesAnoSelecionado.ano), Number(mesAnoSelecionado.mes) - 1)
+                    .toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}
+                </MesSelecionado>
+              )
             )}
           </div>
           <VisualizacaoSelector
